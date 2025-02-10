@@ -1,5 +1,12 @@
 const main = @import("main.zig");
 
+pub const empty_bag_slot: main.Item = .{
+    .ID = 0,
+    .description = "empty bag slot",
+    .gold_value = 0,
+    .name = "empty slot",
+};
+
 pub const sword: main.Item = .{
     .ID = 1,
     .name = "sword",
