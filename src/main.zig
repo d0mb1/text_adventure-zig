@@ -1,4 +1,5 @@
 const std = @import("std");
+const items = @import("items.zig");
 
 const base_bag_size: i8 = 10;
 
@@ -9,39 +10,42 @@ const empty_bag_slot: Item = .{
     .name = "empty slot",
 };
 
-const Player = struct {
+pub const Player = struct {
     map_mark: u8 = 'P',
     max_health: i8 = 10,
     curr_health: i8,
     attack_strenght: i8,
     inventory: [base_bag_size]Item,
 
-    fn printBag(self: Player) void {
+    fn printBag(self: Player) !void {
+        const stdout = std.io.getStdOut().writer();
         for (self.inventory) |item| {
             if (item.ID == empty_bag_slot.ID) continue;
-            std.debug.print("{s}, ", .{item.name});
+            try stdout.print("{s}, ", .{item.name});
         }
         std.debug.print("\n", .{});
     }
 
-    fn add_to_bag(self: *Player, new_item: Item) void {
+    fn add_to_bag(self: *Player, new_item: Item) !void {
+        const stdout = std.io.getStdOut().writer();
         for (&self.inventory) |*item| {
             if (item.ID == empty_bag_slot.ID) {
                 item.* = new_item;
                 return;
             }
         }
-        std.debug.print("Your bag is full!\n", .{});
+        try stdout.print("Your bag is full!\n", .{});
     }
 
-    fn remove_from_bag(self: *Player, rem_item: Item) void {
+    fn remove_from_bag(self: *Player, rem_item: Item) !void {
+        const stdout = std.io.getStdOut().writer();
         for (&self.inventory) |*item| {
             if (item.ID == rem_item.ID) {
                 item.* = empty_bag_slot;
                 return;
             }
         }
-        std.debug.print("Item not found\n", .{});
+        try stdout.print("Item not found\n", .{});
     }
 };
 
@@ -54,7 +58,7 @@ const Monster = struct {
     item_drop: Item,
 };
 
-const Item = struct {
+pub const Item = struct {
     ID: i8,
     name: []const u8,
     map_mark: u8 = 'I',
@@ -62,26 +66,25 @@ const Item = struct {
     description: []const u8,
 };
 
-pub fn main() void {
+pub fn main() !void {
+    const stdout = std.io.getStdOut().writer();
     var player: Player = .{
         .curr_health = 10,
         .attack_strenght = 2,
         .inventory = [_]Item{empty_bag_slot} ** base_bag_size,
     };
-    player.printBag();
-    const sword: Item = .{ .ID = 1, .description = "You slash things with it", .gold_value = 4, .name = "sword" };
-    const potion: Item = .{ .ID = 2, .description = "Heals you up", .gold_value = 2, .name = "potion of health" };
-    player.add_to_bag(sword);
-    player.printBag();
-    player.remove_from_bag(potion);
-    player.add_to_bag(potion);
-    player.printBag();
-    player.remove_from_bag(sword);
-    player.printBag();
-    player.remove_from_bag(sword);
-    player.printBag();
-    player.remove_from_bag(potion);
-    player.printBag();
-    std.debug.print("Player has: {} max health\n", .{player.max_health});
-    std.debug.print("compiled!\n", .{});
+    try player.printBag();
+    try player.add_to_bag(items.sword);
+    try player.printBag();
+    try player.remove_from_bag(items.potion);
+    try player.add_to_bag(items.potion);
+    try player.printBag();
+    try player.remove_from_bag(items.sword);
+    try player.printBag();
+    try player.remove_from_bag(items.sword);
+    try player.printBag();
+    try player.remove_from_bag(items.potion);
+    try player.printBag();
+    try stdout.print("Player has: {} max health\n", .{player.max_health});
+    try stdout.print("Compiled!\n", .{});
 }
