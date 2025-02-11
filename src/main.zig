@@ -1,14 +1,15 @@
 const std = @import("std");
 const items = @import("items.zig");
+const rooms = @import("rooms.zig");
 
-const base_bag_size: i8 = 10;
+const bag_size: i8 = 10;
 
 pub const Player = struct {
     map_mark: u8 = 'P',
     max_health: i8 = 10,
     curr_health: i8,
     attack_strenght: i8,
-    inventory: [base_bag_size]items.Item,
+    inventory: [bag_size]items.Item,
 
     fn printBag(self: Player) !void {
         const stdout = std.io.getStdOut().writer();
@@ -19,18 +20,19 @@ pub const Player = struct {
                 empty_spaces += 1;
                 continue;
             }
-            try stdout.print("{s} ", .{item.name});
+            try stdout.print("{s}  ", .{item.name});
             if (i % num_of_columns == 0) try stdout.print("\n", .{});
         }
-        const full_spaces = 10 - empty_spaces;
+        const full_spaces = bag_size - empty_spaces;
         for (0..empty_spaces, full_spaces..) |e, i| {
             if (i % num_of_columns == 0 and e != 0) try stdout.print("\n", .{});
-            try stdout.print("[ ] ", .{});
+            try stdout.print("[ ___ ]  ", .{});
         }
         std.debug.print("\n\n", .{});
     }
 
-    fn add_to_bag(self: *Player, new_item: items.Item) !void {
+    // NOTE: Might not be needed. Alternative fn in Item struct
+    fn addToBag(self: *Player, new_item: items.Item) !void {
         const stdout = std.io.getStdOut().writer();
         for (&self.inventory) |*item| {
             if (item.ID == items.empty_bag_slot.ID) {
@@ -41,7 +43,8 @@ pub const Player = struct {
         try stdout.print("Your bag is full!\n", .{});
     }
 
-    fn remove_from_bag(self: *Player, rem_item: items.Item) !void {
+    // NOTE: Might not be needed. Alternative fn in Item struct
+    fn removeFromBag(self: *Player, rem_item: items.Item) !void {
         const stdout = std.io.getStdOut().writer();
         for (&self.inventory) |*item| {
             if (item.ID == rem_item.ID) {
@@ -49,11 +52,17 @@ pub const Player = struct {
                 return;
             }
         }
-        try stdout.print("Item not found\n", .{});
+        try stdout.print("Item not found!\n", .{});
     }
 };
 
-const Monster = struct {
+pub var player: Player = .{
+    .curr_health = 10,
+    .attack_strenght = 2,
+    .inventory = [_]items.Item{items.empty_bag_slot} ** bag_size,
+};
+
+pub const Monster = struct {
     name: []const u8,
     map_mark: u8 = 'M',
     max_health: i8,
@@ -64,22 +73,12 @@ const Monster = struct {
 
 pub fn main() !void {
     const stdout = std.io.getStdOut().writer();
-    var player: Player = .{
-        .curr_health = 10,
-        .attack_strenght = 2,
-        .inventory = [_]items.Item{items.empty_bag_slot} ** base_bag_size,
-    };
+    try stdout.print("\x1B[2J\x1B[H", .{});
+    try items.sword.addToBag();
+    try items.rock.addToBag();
     try player.printBag();
-    try player.add_to_bag(items.sword);
-    try player.add_to_bag(items.sword);
-    try player.add_to_bag(items.sword);
-    try player.add_to_bag(items.sword);
-    try player.add_to_bag(items.sword);
-    try player.add_to_bag(items.sword);
-    try player.add_to_bag(items.sword);
-    try player.add_to_bag(items.sword);
-    try player.add_to_bag(items.potion);
+    // try rooms.entrance.print();
+    try items.potion.removeFromBag();
+    try items.sword.removeFromBag();
     try player.printBag();
-    try stdout.print("Player has: {} max health\n", .{player.max_health});
-    try stdout.print("Compiled!\n", .{});
 }
