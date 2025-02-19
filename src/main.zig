@@ -26,7 +26,7 @@ pub const Player = struct {
         const full_spaces = bag_size - empty_spaces;
         for (0..empty_spaces, full_spaces..) |e, i| {
             if (i % num_of_columns == 0 and e != 0) try stdout.print("\n", .{});
-            try stdout.print("[ ___ ]  ", .{});
+            try stdout.print("[ ---- ]  ", .{});
         }
         std.debug.print("\n\n", .{});
     }
@@ -74,11 +74,15 @@ pub const Monster = struct {
 pub fn main() !void {
     const stdout = std.io.getStdOut().writer();
     try stdout.print("\x1B[2J\x1B[H", .{});
-    try items.sword.addToBag();
-    try items.rock.addToBag();
-    try player.printBag();
+    // var curr_room = rooms.entrance;
+    // try items.sword.addToBag();
+    // try items.rock.addToBag();
+    // try player.printBag();
     // try rooms.entrance.print();
-    try items.potion.removeFromBag();
-    try items.sword.removeFromBag();
-    try player.printBag();
+    // try items.potion.removeFromBag();
+    // try items.sword.removeFromBag();
+    // try player.printBag();
+    while (true) {
+        // curr_room = try curr_room.walkThrueRooms();
+    }
 }

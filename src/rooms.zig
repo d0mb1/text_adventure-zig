@@ -1,11 +1,18 @@
 const std = @import("std");
 const main = @import("main.zig");
+const items = @import("items.zig");
 
 pub const Room = struct {
     ID: i8,
     name: []const u8,
     description: []const u8,
     image: []const u8,
+    key: ?*const items.Item,
+    loot: ?*const items.Item,
+    next_room_1: ?*const Room,
+    next_room_2: ?*const Room,
+    next_room_3: ?*const Room,
+    next_room_4: ?*const Room,
     // enemies: []main.Monster,
 
     pub fn print(self: Room) !void {
@@ -63,4 +70,23 @@ pub const entrance: Room = .{
     \\####%%%%#[{}]}([})}{}+  -]<   :      *    ]^^   .++  ).:. )]])](])([][[([}[{}{{{
     \\%%%%%#}{{}{][}[[[([{##:..={]   ^{#  +. ]+ .-~=)~. <.:-}(~~+](]<))()(]]][[}[}{}#{
     ,
+    .key = null,
+    .loot = null,
+    .next_room_1 = &entrance_hall,
+    .next_room_2 = null,
+    .next_room_3 = null,
+    .next_room_4 = null,
+};
+
+pub const entrance_hall: Room = .{
+    .ID = 1,
+    .name = "ENTRANCE HALL",
+    .description = "A long hallway with high ceilings and a row of pillars on each side.",
+    .image = "",
+    .key = null,
+    .loot = null,
+    .next_room_1 = null,
+    .next_room_2 = null,
+    .next_room_3 = null,
+    .next_room_4 = null,
 };
